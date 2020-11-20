@@ -1,0 +1,33 @@
+{
+  "name": "overflow-tabs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "clean": "rm -rf dist .cache",
+    "build": "npm run clean && parcel build src/index.html --no-source-maps"
+  },
+  "lint-staged": {
+    "./{src/**/*.js,src/**/*.jsx,src/**/*.scss}": "prettier --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "author": "Dimitar Slaev <dimslaev@gmail.com>",
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "@babel/runtime": "^7.9.6",
+    "classnames": "^2.2.6",
+    "husky": "^4.3.0",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.0.5",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-dom": "^16.13.1",
+    "sass": "^1.26.5"
+  }
+}

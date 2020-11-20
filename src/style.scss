@@ -1,0 +1,21 @@
+@import "reset";
+
+body {
+  background: #777;
+}
+
+.container {
+  text-align: center;
+  padding: 80px;
+}
+
+.title {
+  font-size: 32px;
+  margin-bottom: 32px;
+}
+
+.preview {
+  width: 100%;
+  max-width: 290px;
+  margin: 0 auto;
+}
