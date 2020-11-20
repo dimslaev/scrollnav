@@ -42,10 +42,16 @@ class OverflowTabs extends Component {
       this.checkIfCanScroll();
       this.addListeners();
     });
+  }
 
-    return function cleanup() {
-      this.removeListeners();
-    };
+  componentWillUnmount() {
+    const {
+      state: { listEl, containerEl },
+    } = this;
+
+    if (!listEl || !containerEl) return;
+
+    this.removeListeners();
   }
 
   render() {
