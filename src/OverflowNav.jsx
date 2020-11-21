@@ -1,9 +1,8 @@
 import React, { Component, createRef } from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
-import IconChevron from "./icon-chevron.svg";
 import SmoothScrollTo from "./smoothScrollTo";
-import "./OverflowTabs.scss";
+import "./OverflowNav.scss";
 
 const propTypes = {
   items: PropTypes.array.isRequired,
@@ -12,7 +11,7 @@ const propTypes = {
   className: PropTypes.string,
 };
 
-class OverflowTabs extends Component {
+class OverflowNav extends Component {
   static propTypes = propTypes;
 
   constructor(props) {
@@ -65,45 +64,45 @@ class OverflowTabs extends Component {
     } = this;
 
     const listClasses = cn({
-      "overflow-tabs-nav__list": true,
-      "overflow-tabs-nav__list--scrollable": canScroll,
+      "overflow-nav__list": true,
+      "overflow-nav__list--scrollable": canScroll,
     });
 
     const buttonAscClasses = cn({
-      "overflow-tabs-nav__button": true,
-      "overflow-tabs-nav__button--asc": true,
-      "overflow-tabs-nav__button--hidden":
+      "overflow-nav__button": true,
+      "overflow-nav__button--asc": true,
+      "overflow-nav__button--hidden":
         !canScroll || (lastDirection === "asc" && reachedScrollEnd),
     });
 
     const buttonDescClasses = cn({
-      "overflow-tabs-nav__button": true,
-      "overflow-tabs-nav__button--desc": true,
-      "overflow-tabs-nav__button--hidden":
+      "overflow-nav__button": true,
+      "overflow-nav__button--desc": true,
+      "overflow-nav__button--hidden":
         !canScroll ||
         lastScrollLeft === 0 ||
         (lastDirection === "desc" && reachedScrollEnd),
     });
 
     return (
-      <nav className="overflow-tabs-nav" ref={containerRef}>
+      <nav className="overflow-nav" ref={containerRef}>
         <button
           className={buttonAscClasses}
           onClick={onScrollButtonClick("asc")}
         >
-          <img className="overflow-tabs-nav__button__icon" src={IconChevron} />
+          <span className="overflow-nav__button__icon" />
         </button>
 
         <ul className={listClasses} ref={listRef}>
           {items.map((item, index) => {
             const classes = cn({
-              "overflow-tabs-nav__list__item": true,
-              "overflow-tabs-nav__list__item--active": index === activeIndex,
+              "overflow-nav__list__item": true,
+              "overflow-nav__list__item--active": index === activeIndex,
             });
 
             return (
               <li
-                key={`overflow-tabs-nav-item-${index}`}
+                key={`overflow-nav-item-${index}`}
                 className={classes}
                 onClick={onNavItemClick(index)}
               >
@@ -117,7 +116,7 @@ class OverflowTabs extends Component {
           className={buttonDescClasses}
           onClick={onScrollButtonClick("desc")}
         >
-          <img className="overflow-tabs-nav__button__icon" src={IconChevron} />
+          <span className="overflow-nav__button__icon" />
         </button>
       </nav>
     );
@@ -200,4 +199,4 @@ class OverflowTabs extends Component {
   };
 }
 
-export default OverflowTabs;
+export default OverflowNav;

@@ -13,7 +13,7 @@ $scrollbar-width: $unit;
 $scrollbar-height: $unit / 4;
 $scrollbar-radius: $unit / 4;
 
-.overflow-tabs-nav {
+.overflow-nav {
   position: relative;
   display: flex;
   align-items: center;
@@ -98,29 +98,34 @@ $scrollbar-radius: $unit / 4;
     display: flex;
     align-items: center;
 
+    padding: 0;
+    width: $unit * 4;
+    height: $unit * 4;
+
     position: absolute;
     z-index: 1;
     top: calc(50% - 2px);
     transform: translateY(-50%);
 
-    width: $unit * 4;
-    height: $unit * 4;
-
-    img {
+    &__icon {
       width: $unit;
-      height: $unit * 1.5;
+      height: $unit * 2;
       opacity: 0.65;
+      background-image: url("data:image/svg+xml,%3Csvg width='14' height='24' viewBox='0 0 14 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M1.83 24L0 22L10 11.996L0 2L1.83 0L14 11.996L1.83 24Z' /%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: $unit;
+      background-position: center;
     }
 
     &:hover {
-      img {
+      .overflow-nav__button__icon {
         opacity: 1;
       }
     }
 
     &:active {
-      img {
-        opacity: 0.5;
+      .overflow-nav__button__icon {
+        opacity: 1;
       }
     }
 
@@ -145,7 +150,7 @@ $scrollbar-radius: $unit / 4;
         $color-background 60%
       );
 
-      img {
+      .overflow-nav__button__icon {
         transform: rotate(-180deg);
       }
     }

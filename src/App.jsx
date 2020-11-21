@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import OverflowTabs from "./OverflowTabs";
+import OverflowNav from "./OverflowNav";
 import "./style.scss";
 
 const items = [
@@ -32,10 +32,10 @@ export class App extends Component {
 
     return (
       <div className="container">
-        <h1 className="title">OverflowTabs</h1>
+        <h1 className="title">OverflowNav</h1>
 
         <div className="preview">
-          <OverflowTabs
+          <OverflowNav
             items={items}
             activeIndex={activeIndex}
             onItemClick={onItemClick}
