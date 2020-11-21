@@ -147,7 +147,11 @@ class OverflowNav extends Component {
     let reachedScrollEnd = false;
 
     if (direction === "asc") {
-      reachedScrollEnd = scrollLeft + offsetWidth >= scrollWidth;
+      // On iOS, sometimes the scroll end is not always detected
+      // so an adjustment of 1px is needed.
+      const iosMobileAdjustment = 1;
+      reachedScrollEnd =
+        scrollLeft + offsetWidth >= scrollWidth - iosMobileAdjustment;
     } else {
       reachedScrollEnd = scrollLeft === 0;
     }
