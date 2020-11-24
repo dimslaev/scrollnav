@@ -17,10 +17,22 @@ const propTypes = {
       );
     }
   },
+  colors: PropTypes.shape({
+    scrollbarTrackColor: PropTypes.string,
+    scrollbarThumbColor: PropTypes.string,
+    buttonShadowColor: PropTypes.string,
+    buttonArrowColor: PropTypes.string,
+  }),
 };
 
 const defaultProps = {
   scrollStepSize: DEFAULT_SCROLL_STEP_SIZE,
+  colors: {
+    scrollbarTrackColor: "#999",
+    scrollbarThumbColor: "#333",
+    buttonShadowColor: "",
+    buttonArrowColor: "",
+  },
 };
 
 class OverflowNav extends Component {
@@ -36,12 +48,14 @@ class OverflowNav extends Component {
       reachedScrollEnd: false,
       lastScrollLeft: 0,
       lastDirection: "asc",
-      navContentEl: null,
       navEl: null,
+      navContentEl: null,
     };
 
     this.navRef = createRef();
     this.navContentRef = createRef();
+    this.scrollbarRef = createRef();
+    this.scrollbarThumbRef = createRef();
   }
 
   componentDidMount() {
@@ -72,8 +86,26 @@ class OverflowNav extends Component {
       onScrollButtonClick,
       navRef,
       navContentRef,
-      state: { canScroll, reachedScrollEnd, lastScrollLeft, lastDirection },
-      props: { children, className },
+      scrollbarRef,
+      scrollbarThumbRef,
+      state: {
+        canScroll,
+        reachedScrollEnd,
+        lastScrollLeft,
+        lastDirection,
+        navEl,
+        navContentEl,
+      },
+      props: {
+        children,
+        className,
+        colors: {
+          scrollbarTrackColor,
+          scrollbarThumbColor,
+          buttonShadowColor,
+          buttonArrowColor,
+        },
+      },
     } = this;
 
     const navClasses = cn({
@@ -102,6 +134,37 @@ class OverflowNav extends Component {
         (lastDirection === "desc" && reachedScrollEnd),
     });
 
+    const scrollbarClasses = cn({
+      "overflow-nav__scrollbar": true,
+      "overflow-nav__scrollbar--hidden": !canScroll,
+    });
+
+    const scrollbarThumbClasses = cn({
+      "overflow-nav__scrollbar__thumb": true,
+    });
+
+    const scrollbarTrackStyles = {};
+    const scrollbarThumbStyles = {};
+
+    if (scrollbarTrackColor.length > 0) {
+      scrollbarTrackStyles.background = scrollbarTrackColor;
+    }
+
+    if (scrollbarThumbColor.length > 0) {
+      scrollbarThumbStyles.background = scrollbarThumbColor;
+    }
+
+    if (navEl && navContentEl) {
+      const containerWidth = navEl.offsetWidth;
+      const scrollWidth = navContentEl.scrollWidth;
+      const ratio = containerWidth / scrollWidth;
+      const thumbWidth = ratio * containerWidth;
+      const thumbLeft = ratio * navContentEl.scrollLeft;
+
+      scrollbarThumbStyles.width = thumbWidth;
+      scrollbarThumbStyles.transform = `translateX(${thumbLeft}px)`;
+    }
+
     return (
       <nav className={navClasses} ref={navRef}>
         <button
@@ -113,6 +176,18 @@ class OverflowNav extends Component {
 
         <div className={contentClasses} ref={navContentRef}>
           {children}
+        </div>
+
+        <div
+          className={scrollbarClasses}
+          ref={scrollbarRef}
+          style={scrollbarTrackStyles}
+        >
+          <div
+            className={scrollbarThumbClasses}
+            ref={scrollbarThumbRef}
+            style={scrollbarThumbStyles}
+          ></div>
         </div>
 
         <button

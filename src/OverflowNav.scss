@@ -5,35 +5,46 @@ $color-background: #777;
 $scrollbar-width: $unit;
 $scrollbar-height: $unit / 4;
 $scrollbar-radius: $unit / 4;
+$scrollbar-margin-top: $unit / 4;
 
 .overflow-nav {
   position: relative;
-  display: flex;
-  align-items: center;
+  padding-bottom: $scrollbar-height + $scrollbar-margin-top;
 
-  scrollbar-width: thin;
-  scrollbar-color: $scrollbar-thumb-color $scrollbar-track-color;
-
-  ::-webkit-scrollbar {
-    width: $scrollbar-width;
+  &__scrollbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     height: $scrollbar-height;
-  }
-  ::-webkit-scrollbar-track {
     background: $scrollbar-track-color;
-    border-radius: $scrollbar-radius;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: $scrollbar-thumb-color;
-    border-radius: $scrollbar-radius;
+
+    &__thumb {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: inherit;
+      border-radius: $scrollbar-radius;
+      background: $scrollbar-thumb-color;
+    }
   }
 
   &__content {
     display: flex;
-    padding-bottom: $unit / 4;
+    height: calc(100% - #{$scrollbar-height + $scrollbar-margin-top});
 
     &--scrollable {
       overflow: auto;
       -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      @-moz-document url-prefix() {
+        overflow: hidden;
+      }
     }
   }
 
@@ -43,7 +54,8 @@ $scrollbar-radius: $unit / 4;
 
     padding: 0;
     width: $unit * 4;
-    height: $unit * 4;
+    height: calc(100% - 1px);
+    min-height: $unit * 2;
 
     position: absolute;
     z-index: 1;
