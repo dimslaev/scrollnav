@@ -1,7 +1,7 @@
 import React, { Component, createRef } from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
-import SmoothScrollTo from "./smoothScrollTo";
+import SmoothScrollTo from "@dims/smooth-scroll-to";
 import "./OverflowNav.scss";
 
 const propTypes = {
