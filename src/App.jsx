@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import OverflowNav from "./OverflowNav";
+import cn from "classnames";
 import "./style.scss";
 
 const items = [
@@ -20,7 +21,7 @@ export class App extends Component {
     activeIndex: 0,
   };
 
-  onItemClick = (index) => {
+  onItemClick = (index) => () => {
     this.setState({ activeIndex: index });
   };
 
@@ -35,12 +36,24 @@ export class App extends Component {
         <h1 className="title">OverflowNav</h1>
 
         <div className="preview">
-          <OverflowNav
-            items={items}
-            activeIndex={activeIndex}
-            onItemClick={onItemClick}
-            className="custom-class"
-          />
+          <OverflowNav className="custom-class" scrollStepSize={0.5}>
+            {items.map((item, index) => {
+              const classes = cn({
+                list__item: true,
+                "list__item--active": index === activeIndex,
+              });
+
+              return (
+                <div
+                  key={`list-item-${index}`}
+                  className={classes}
+                  onClick={onItemClick(index)}
+                >
+                  {item}
+                </div>
+              );
+            })}
+          </OverflowNav>
         </div>
       </div>
     );

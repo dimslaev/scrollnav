@@ -4,15 +4,29 @@ import cn from "classnames";
 import SmoothScrollTo from "@dims/smooth-scroll-to";
 import "./OverflowNav.scss";
 
+const MIN_SCROLL_STEP_SIZE = 0.1;
+const DEFAULT_SCROLL_STEP_SIZE = 0.5;
+
 const propTypes = {
-  items: PropTypes.array.isRequired,
-  activeIndex: PropTypes.number.isRequired,
-  onItemClick: PropTypes.func.isRequired,
+  children: PropTypes.arrayOf(PropTypes.node).isRequired,
   className: PropTypes.string,
+  scrollStepSize: function (props, propName) {
+    if (props[propName] < MIN_SCROLL_STEP_SIZE) {
+      return new Error(
+        `scrollStepSize must be at least ${MIN_SCROLL_STEP_SIZE}.`
+      );
+    }
+  },
+};
+
+const defaultProps = {
+  scrollStepSize: DEFAULT_SCROLL_STEP_SIZE,
 };
 
 class OverflowNav extends Component {
   static propTypes = propTypes;
+
+  static defaultProps = defaultProps;
 
   constructor(props) {
     super(props);
@@ -22,22 +36,22 @@ class OverflowNav extends Component {
       reachedScrollEnd: false,
       lastScrollLeft: 0,
       lastDirection: "asc",
-      listEl: null,
-      containerEl: null,
+      navContentEl: null,
+      navEl: null,
     };
 
-    this.containerRef = createRef();
-    this.listRef = createRef();
+    this.navRef = createRef();
+    this.navContentRef = createRef();
   }
 
   componentDidMount() {
-    const { listRef, containerRef } = this;
-    const listEl = listRef.current;
-    const containerEl = containerRef.current;
+    const { navRef, navContentRef } = this;
+    const navEl = navRef.current;
+    const navContentEl = navContentRef.current;
 
-    if (!listEl || !containerEl) return;
+    if (!navEl || !navContentEl) return;
 
-    this.setState({ listEl, containerEl }, () => {
+    this.setState({ navEl, navContentEl }, () => {
       this.checkIfCanScroll();
       this.addListeners();
     });
@@ -45,27 +59,31 @@ class OverflowNav extends Component {
 
   componentWillUnmount() {
     const {
-      state: { listEl, containerEl },
+      state: { navEl, navContentEl },
     } = this;
 
-    if (!listEl || !containerEl) return;
+    if (!navEl || !navContentEl) return;
 
     this.removeListeners();
   }
 
   render() {
     const {
-      onNavItemClick,
       onScrollButtonClick,
-      containerRef,
-      listRef,
+      navRef,
+      navContentRef,
       state: { canScroll, reachedScrollEnd, lastScrollLeft, lastDirection },
-      props: { activeIndex, items },
+      props: { children, className },
     } = this;
 
-    const listClasses = cn({
-      "overflow-nav__list": true,
-      "overflow-nav__list--scrollable": canScroll,
+    const navClasses = cn({
+      "overflow-nav": true,
+      [className]: typeof className === "string" && className.length > 0,
+    });
+
+    const contentClasses = cn({
+      "overflow-nav__content": true,
+      "overflow-nav__content--scrollable": canScroll,
     });
 
     const buttonAscClasses = cn({
@@ -85,7 +103,7 @@ class OverflowNav extends Component {
     });
 
     return (
-      <nav className="overflow-nav" ref={containerRef}>
+      <nav className={navClasses} ref={navRef}>
         <button
           className={buttonAscClasses}
           onClick={onScrollButtonClick("asc")}
@@ -93,24 +111,9 @@ class OverflowNav extends Component {
           <span className="overflow-nav__button__icon" />
         </button>
 
-        <ul className={listClasses} ref={listRef}>
-          {items.map((item, index) => {
-            const classes = cn({
-              "overflow-nav__list__item": true,
-              "overflow-nav__list__item--active": index === activeIndex,
-            });
-
-            return (
-              <li
-                key={`overflow-nav-item-${index}`}
-                className={classes}
-                onClick={onNavItemClick(index)}
-              >
-                {item}
-              </li>
-            );
-          })}
-        </ul>
+        <div className={contentClasses} ref={navContentRef}>
+          {children}
+        </div>
 
         <button
           className={buttonDescClasses}
@@ -124,25 +127,25 @@ class OverflowNav extends Component {
 
   addListeners = () => {
     const {
-      state: { listEl },
+      state: { navContentEl },
     } = this;
 
-    listEl.addEventListener("scroll", this.onScroll);
+    navContentEl.addEventListener("scroll", this.onScroll);
     window.addEventListener("resize", this.checkIfCanScroll);
   };
 
   removeListeners = () => {
-    listEl.removeEventListener("scroll", this.onScroll);
+    navContentEl.removeEventListener("scroll", this.onScroll);
     window.removeEventListener("resize", this.checkIfCanScroll);
   };
 
   onScroll = () => {
     const {
-      state: { containerEl, listEl, lastScrollLeft },
+      state: { navEl, navContentEl, lastScrollLeft },
     } = this;
 
-    const { scrollLeft, scrollWidth } = listEl;
-    const { offsetWidth } = containerEl;
+    const { scrollLeft, scrollWidth } = navContentEl;
+    const { offsetWidth } = navEl;
     const direction = lastScrollLeft < scrollLeft ? "asc" : "desc";
     let reachedScrollEnd = false;
 
@@ -173,17 +176,19 @@ class OverflowNav extends Component {
 
   onScrollButtonClick = (direction) => () => {
     const {
-      state: { listEl, containerEl },
+      state: { navEl, navContentEl },
+      props: { scrollStepSize },
     } = this;
 
-    const { scrollLeft } = listEl;
-    const { offsetWidth } = containerEl;
-    const offset = offsetWidth * 0.5;
+    const { scrollLeft } = navContentEl;
+    const { offsetWidth } = navEl;
+    const scrollSize = offsetWidth * scrollStepSize;
 
-    const to = direction === "asc" ? scrollLeft + offset : scrollLeft - offset;
+    const to =
+      direction === "asc" ? scrollLeft + scrollSize : scrollLeft - scrollSize;
 
     const scroll = new SmoothScrollTo({
-      target: listEl,
+      target: navContentEl,
       axis: "x",
       to,
       duration: 150,
@@ -193,11 +198,11 @@ class OverflowNav extends Component {
 
   checkIfCanScroll = () => {
     const {
-      state: { containerEl, listEl },
+      state: { navEl, navContentEl },
     } = this;
 
-    const containerWidth = containerEl.offsetWidth;
-    const scrollWidth = listEl.scrollWidth;
+    const containerWidth = navEl.offsetWidth;
+    const scrollWidth = navContentEl.scrollWidth;
 
     this.setState({ canScroll: containerWidth < scrollWidth ? true : false });
   };

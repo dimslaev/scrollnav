@@ -1,7 +1,13 @@
 @import "reset";
 
+$unit: 8px;
+$nav-item-padding-y: $unit / 1.5;
+$nav-item-padding-x: $unit;
+$color-background: #777;
+$color-active: blue;
+
 body {
-  background: #777;
+  background: $color-background;
 }
 
 .container {
@@ -18,4 +24,56 @@ body {
   width: 100%;
   max-width: 290px;
   margin: 0 auto;
+}
+
+.list {
+  display: flex;
+
+  &__item {
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    position: relative;
+    padding: $nav-item-padding-y $nav-item-padding-x;
+    margin-right: $unit * 2;
+
+    &:after {
+      display: none;
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: $nav-item-padding-x;
+      right: $nav-item-padding-x;
+      height: $unit / 4;
+    }
+
+    &:first-child {
+      padding-left: 0;
+
+      &:after {
+        left: 0;
+      }
+    }
+
+    &:last-child {
+      padding-right: 0;
+      margin-right: 0;
+
+      &:after {
+        right: 0;
+      }
+    }
+
+    &--active {
+      color: $color-active;
+    }
+
+    &--active,
+    &:hover {
+      &:after {
+        display: block;
+        background: $color-active;
+      }
+    }
+  }
 }
