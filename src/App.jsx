@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import OverflowNav from "./OverflowNav";
+import OverflowNav from "./OverflowNav/OverflowNav";
 import cn from "classnames";
 import "./style.scss";
 
@@ -36,7 +36,14 @@ export class App extends Component {
         <h1 className="title">OverflowNav</h1>
 
         <div className="preview">
-          <OverflowNav className="custom-class" scrollStepSize={0.5}>
+          <OverflowNav
+            className="custom-class"
+            scrollStepSize={0.5}
+            scrollbarTrackColor="#888"
+            scrollbarThumbColor="#555"
+            buttonShadowColor="#777"
+            buttonArrowColor="#fff"
+          >
             {items.map((item, index) => {
               const classes = cn({
                 list__item: true,

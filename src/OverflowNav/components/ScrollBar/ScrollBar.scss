@@ -1,0 +1,20 @@
+@import "../../vars";
+
+.overflow-nav__scrollbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: $scrollbar-height;
+  background: $scrollbar-track-color;
+
+  &__thumb {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: inherit;
+    border-radius: $scrollbar-radius;
+    background: $scrollbar-thumb-color;
+  }
+}

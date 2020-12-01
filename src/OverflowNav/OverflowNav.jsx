@@ -1,5 +1,7 @@
 import React, { Component, createRef } from "react";
 import PropTypes from "prop-types";
+import Controls from "./components/Controls/Controls";
+import ScrollBar from "./components/ScrollBar/ScrollBar";
 import cn from "classnames";
 import SmoothScrollTo from "@dims/smooth-scroll-to";
 import "./OverflowNav.scss";
@@ -17,22 +19,18 @@ const propTypes = {
       );
     }
   },
-  colors: PropTypes.shape({
-    scrollbarTrackColor: PropTypes.string,
-    scrollbarThumbColor: PropTypes.string,
-    buttonShadowColor: PropTypes.string,
-    buttonArrowColor: PropTypes.string,
-  }),
+  scrollbarTrackColor: PropTypes.string,
+  scrollbarThumbColor: PropTypes.string,
+  buttonShadowColor: PropTypes.string,
+  buttonArrowColor: PropTypes.string,
 };
 
 const defaultProps = {
   scrollStepSize: DEFAULT_SCROLL_STEP_SIZE,
-  colors: {
-    scrollbarTrackColor: "#999",
-    scrollbarThumbColor: "#333",
-    buttonShadowColor: "",
-    buttonArrowColor: "",
-  },
+  scrollbarTrackColor: "#888",
+  scrollbarThumbColor: "#555",
+  buttonShadowColor: "#777",
+  buttonArrowColor: "#fff",
 };
 
 class OverflowNav extends Component {
@@ -47,15 +45,13 @@ class OverflowNav extends Component {
       canScroll: false,
       reachedScrollEnd: false,
       lastScrollLeft: 0,
-      lastDirection: "asc",
+      lastDirection: "next",
       navEl: null,
       navContentEl: null,
     };
 
     this.navRef = createRef();
     this.navContentRef = createRef();
-    this.scrollbarRef = createRef();
-    this.scrollbarThumbRef = createRef();
   }
 
   componentDidMount() {
@@ -86,8 +82,6 @@ class OverflowNav extends Component {
       onScrollButtonClick,
       navRef,
       navContentRef,
-      scrollbarRef,
-      scrollbarThumbRef,
       state: {
         canScroll,
         reachedScrollEnd,
@@ -99,12 +93,10 @@ class OverflowNav extends Component {
       props: {
         children,
         className,
-        colors: {
-          scrollbarTrackColor,
-          scrollbarThumbColor,
-          buttonShadowColor,
-          buttonArrowColor,
-        },
+        scrollbarTrackColor,
+        scrollbarThumbColor,
+        buttonShadowColor,
+        buttonArrowColor,
       },
     } = this;
 
@@ -118,84 +110,35 @@ class OverflowNav extends Component {
       "overflow-nav__content--scrollable": canScroll,
     });
 
-    const buttonAscClasses = cn({
-      "overflow-nav__button": true,
-      "overflow-nav__button--asc": true,
-      "overflow-nav__button--hidden":
-        !canScroll || (lastDirection === "asc" && reachedScrollEnd),
-    });
+    const hideNextButton =
+      !canScroll || (lastDirection === "next" && reachedScrollEnd);
 
-    const buttonDescClasses = cn({
-      "overflow-nav__button": true,
-      "overflow-nav__button--desc": true,
-      "overflow-nav__button--hidden":
-        !canScroll ||
-        lastScrollLeft === 0 ||
-        (lastDirection === "desc" && reachedScrollEnd),
-    });
-
-    const scrollbarClasses = cn({
-      "overflow-nav__scrollbar": true,
-      "overflow-nav__scrollbar--hidden": !canScroll,
-    });
-
-    const scrollbarThumbClasses = cn({
-      "overflow-nav__scrollbar__thumb": true,
-    });
-
-    const scrollbarTrackStyles = {};
-    const scrollbarThumbStyles = {};
-
-    if (scrollbarTrackColor.length > 0) {
-      scrollbarTrackStyles.background = scrollbarTrackColor;
-    }
-
-    if (scrollbarThumbColor.length > 0) {
-      scrollbarThumbStyles.background = scrollbarThumbColor;
-    }
-
-    if (navEl && navContentEl) {
-      const containerWidth = navEl.offsetWidth;
-      const scrollWidth = navContentEl.scrollWidth;
-      const ratio = containerWidth / scrollWidth;
-      const thumbWidth = ratio * containerWidth;
-      const thumbLeft = ratio * navContentEl.scrollLeft;
-
-      scrollbarThumbStyles.width = thumbWidth;
-      scrollbarThumbStyles.transform = `translateX(${thumbLeft}px)`;
-    }
+    const hidePrevButton =
+      !canScroll ||
+      lastScrollLeft === 0 ||
+      (lastDirection === "prev" && reachedScrollEnd);
 
     return (
       <nav className={navClasses} ref={navRef}>
-        <button
-          className={buttonAscClasses}
-          onClick={onScrollButtonClick("asc")}
-        >
-          <span className="overflow-nav__button__icon" />
-        </button>
-
         <div className={contentClasses} ref={navContentRef}>
           {children}
         </div>
 
-        <div
-          className={scrollbarClasses}
-          ref={scrollbarRef}
-          style={scrollbarTrackStyles}
-        >
-          <div
-            className={scrollbarThumbClasses}
-            ref={scrollbarThumbRef}
-            style={scrollbarThumbStyles}
-          ></div>
-        </div>
+        <ScrollBar
+          hidden={!canScroll}
+          navEl={navEl}
+          navContentEl={navContentEl}
+          scrollbarTrackColor={scrollbarTrackColor}
+          scrollbarThumbColor={scrollbarThumbColor}
+        />
 
-        <button
-          className={buttonDescClasses}
-          onClick={onScrollButtonClick("desc")}
-        >
-          <span className="overflow-nav__button__icon" />
-        </button>
+        <Controls
+          onScrollButtonClick={onScrollButtonClick}
+          hidePrevButton={hidePrevButton}
+          hideNextButton={hideNextButton}
+          buttonShadowColor={buttonShadowColor}
+          buttonArrowColor={buttonArrowColor}
+        />
       </nav>
     );
   }
@@ -221,15 +164,11 @@ class OverflowNav extends Component {
 
     const { scrollLeft, scrollWidth } = navContentEl;
     const { offsetWidth } = navEl;
-    const direction = lastScrollLeft < scrollLeft ? "asc" : "desc";
+    const direction = lastScrollLeft < scrollLeft ? "next" : "prev";
     let reachedScrollEnd = false;
 
-    if (direction === "asc") {
-      // On iOS, sometimes the scroll end is not always detected
-      // so an adjustment of 1px is needed.
-      const iosMobileAdjustment = 1;
-      reachedScrollEnd =
-        scrollLeft + offsetWidth >= scrollWidth - iosMobileAdjustment;
+    if (direction === "next") {
+      reachedScrollEnd = scrollLeft + offsetWidth >= scrollWidth;
     } else {
       reachedScrollEnd = scrollLeft === 0;
     }
@@ -260,7 +199,7 @@ class OverflowNav extends Component {
     const scrollSize = offsetWidth * scrollStepSize;
 
     const to =
-      direction === "asc" ? scrollLeft + scrollSize : scrollLeft - scrollSize;
+      direction === "next" ? scrollLeft + scrollSize : scrollLeft - scrollSize;
 
     const scroll = new SmoothScrollTo({
       target: navContentEl,
