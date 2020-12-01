@@ -4,8 +4,6 @@ import cn from "classnames";
 import "./ScrollBar.scss";
 
 class ScrollBar extends Component {
-  static propTypes = propTypes;
-
   render() {
     const {
       props: {

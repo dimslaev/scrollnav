@@ -4,8 +4,6 @@ import cn from "classnames";
 import "./Controls.scss";
 
 class Controls extends Component {
-  static propTypes = propTypes;
-
   render() {
     const {
       props: {
