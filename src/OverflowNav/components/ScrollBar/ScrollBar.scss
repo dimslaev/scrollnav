@@ -17,4 +17,8 @@
     border-radius: $scrollbar-radius;
     background: $scrollbar-thumb-color;
   }
+
+  &--hidden {
+    display: none;
+  }
 }
