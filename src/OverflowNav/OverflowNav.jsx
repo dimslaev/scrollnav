@@ -9,35 +9,7 @@ import "./OverflowNav.scss";
 const MIN_SCROLL_STEP_SIZE = 0.1;
 const DEFAULT_SCROLL_STEP_SIZE = 0.5;
 
-const propTypes = {
-  children: PropTypes.arrayOf(PropTypes.node).isRequired,
-  className: PropTypes.string,
-  scrollStepSize: function (props, propName) {
-    if (props[propName] < MIN_SCROLL_STEP_SIZE) {
-      return new Error(
-        `scrollStepSize must be at least ${MIN_SCROLL_STEP_SIZE}.`
-      );
-    }
-  },
-  scrollbarTrackColor: PropTypes.string,
-  scrollbarThumbColor: PropTypes.string,
-  buttonShadowColor: PropTypes.string,
-  buttonArrowColor: PropTypes.string,
-};
-
-const defaultProps = {
-  scrollStepSize: DEFAULT_SCROLL_STEP_SIZE,
-  scrollbarTrackColor: "#888",
-  scrollbarThumbColor: "#555",
-  buttonShadowColor: "#777",
-  buttonArrowColor: "#fff",
-};
-
 class OverflowNav extends Component {
-  static propTypes = propTypes;
-
-  static defaultProps = defaultProps;
-
   constructor(props) {
     super(props);
 
@@ -221,5 +193,29 @@ class OverflowNav extends Component {
     this.setState({ canScroll: containerWidth < scrollWidth ? true : false });
   };
 }
+
+OverflowNav.propTypes = {
+  children: PropTypes.arrayOf(PropTypes.node).isRequired,
+  className: PropTypes.string,
+  scrollStepSize: function (props, propName) {
+    if (props[propName] < MIN_SCROLL_STEP_SIZE) {
+      return new Error(
+        `scrollStepSize must be at least ${MIN_SCROLL_STEP_SIZE}.`
+      );
+    }
+  },
+  scrollbarTrackColor: PropTypes.string,
+  scrollbarThumbColor: PropTypes.string,
+  buttonShadowColor: PropTypes.string,
+  buttonArrowColor: PropTypes.string,
+};
+
+OverflowNav.defaultProps = {
+  scrollStepSize: DEFAULT_SCROLL_STEP_SIZE,
+  scrollbarTrackColor: "#888",
+  scrollbarThumbColor: "#555",
+  buttonShadowColor: "#777",
+  buttonArrowColor: "#fff",
+};
 
 export default OverflowNav;

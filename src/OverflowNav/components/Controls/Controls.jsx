@@ -3,14 +3,6 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 import "./Controls.scss";
 
-const propTypes = {
-  hidePrevButton: PropTypes.bool.isRequired,
-  hideNextButton: PropTypes.bool.isRequired,
-  onScrollButtonClick: PropTypes.func.isRequired,
-  buttonShadowColor: PropTypes.string,
-  buttonArrowColor: PropTypes.string,
-};
-
 class Controls extends Component {
   static propTypes = propTypes;
 
@@ -85,5 +77,13 @@ class Controls extends Component {
     );
   }
 }
+
+Controls.propTypes = {
+  hidePrevButton: PropTypes.bool.isRequired,
+  hideNextButton: PropTypes.bool.isRequired,
+  onScrollButtonClick: PropTypes.func.isRequired,
+  buttonShadowColor: PropTypes.string,
+  buttonArrowColor: PropTypes.string,
+};
 
 export default Controls;

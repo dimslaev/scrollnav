@@ -3,14 +3,6 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 import "./ScrollBar.scss";
 
-const propTypes = {
-  hidden: PropTypes.bool.isRequired,
-  navEl: PropTypes.object,
-  navContentEl: PropTypes.object,
-  scrollbarTrackColor: PropTypes.string,
-  scrollbarThumbColor: PropTypes.string,
-};
-
 class ScrollBar extends Component {
   static propTypes = propTypes;
 
@@ -72,5 +64,13 @@ class ScrollBar extends Component {
     );
   }
 }
+
+ScrollBar.propTypes = {
+  hidden: PropTypes.bool.isRequired,
+  navEl: PropTypes.object,
+  navContentEl: PropTypes.object,
+  scrollbarTrackColor: PropTypes.string,
+  scrollbarThumbColor: PropTypes.string,
+};
 
 export default ScrollBar;
