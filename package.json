@@ -21,9 +21,11 @@
     "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-react": "^7.9.4",
     "@babel/runtime": "^7.9.6",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
     "@dims/smooth-scroll-to": "0.0.1",
     "classnames": "^2.2.6",
-    "parcel-bundler": "^1.12.4",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^16.13.1",
