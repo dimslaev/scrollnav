@@ -1,6 +1,6 @@
 {
   "name": "overflow-nav",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Nicely overflowing nav.",
   "source": "src/OverflowNav/OverflowNav.jsx",
   "main": "dist/OverflowNav.js",
