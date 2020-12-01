@@ -1,22 +1,20 @@
 {
   "name": "overflow-nav",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "Nicely overflowing nav.",
+  "main": "./src/OverflowNav/OverflowNav.jsx",
   "scripts": {
     "start": "parcel src/index.html",
     "clean": "rm -rf dist .cache",
     "build": "npm run clean && parcel build src/index.html --no-source-maps"
   },
-  "lint-staged": {
-    "./{src/**/*.js,src/**/*.jsx,src/**/*.scss}": "prettier --write"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimslaev/overflow-nav.git"
   },
   "author": "Dimitar Slaev <dimslaev@gmail.com>",
+  "license": "ISC",
+  "homepage": "https://github.com/dimslaev/overflow-nav",
   "devDependencies": {
     "@babel/core": "^7.12.7",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
@@ -25,10 +23,7 @@
     "@babel/runtime": "^7.9.6",
     "@dims/smooth-scroll-to": "0.0.1",
     "classnames": "^2.2.6",
-    "husky": "^4.3.0",
-    "lint-staged": "^10.2.5",
     "parcel-bundler": "^1.12.4",
-    "prettier": "^2.0.5",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^16.13.1",
