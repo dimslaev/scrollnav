@@ -1,13 +1,12 @@
-@import "reset";
-
 $unit: 8px;
-$nav-item-padding-y: $unit / 1.5;
-$nav-item-padding-x: $unit;
-$color-background: #777;
-$color-active: blue;
+$color-background: #151c26;
+$color-foreground: #74838c;
+$color-active: #bfb7a8;
 
 body {
   background: $color-background;
+  color: $color-foreground;
+  font-family: sans-serif;
 }
 
 .container {
@@ -16,64 +15,39 @@ body {
 }
 
 .title {
-  font-size: 32px;
-  margin-bottom: 32px;
+  margin-bottom: $unit * 4;
+  font-size: $unit * 3;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: $color-active;
 }
 
 .preview {
   width: 100%;
-  max-width: 290px;
+  max-width: $unit * 40;
   margin: 0 auto;
 }
 
-.list {
-  display: flex;
+.item {
+  margin-right: $unit * 2;
 
-  &__item {
-    cursor: pointer;
-    white-space: nowrap;
-    user-select: none;
-    position: relative;
-    padding: $nav-item-padding-y $nav-item-padding-x;
-    margin-right: $unit * 2;
+  color: inherit;
+  user-select: none;
+  cursor: pointer;
+  appearance: none;
+  background: transparent;
+  border: 0;
 
-    &:after {
-      display: none;
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: $nav-item-padding-x;
-      right: $nav-item-padding-x;
-      height: $unit / 4;
-    }
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 
-    &:first-child {
-      padding-left: 0;
+  &--last {
+    margin-right: 0;
+  }
 
-      &:after {
-        left: 0;
-      }
-    }
-
-    &:last-child {
-      padding-right: 0;
-      margin-right: 0;
-
-      &:after {
-        right: 0;
-      }
-    }
-
-    &--active {
-      color: $color-active;
-    }
-
-    &--active,
-    &:hover {
-      &:after {
-        display: block;
-        background: $color-active;
-      }
-    }
+  &--active,
+  &:hover {
+    color: $color-active;
   }
 }

@@ -1,29 +1,33 @@
 {
-  "name": "overflow-nav",
-  "version": "0.0.2",
+  "name": "@dims/scrollnav",
+  "version": "1.0.0",
   "description": "Nicely overflowing nav.",
-  "source": "src/OverflowNav/OverflowNav.jsx",
-  "main": "dist/OverflowNav.js",
+  "source": "src/ScrollNav/ScrollNav.jsx",
+  "main": "dist/scrollnav.js",
   "scripts": {
-    "start": "microbundle watch",
-    "build": "microbundle --css-modules=false"
+    "start": "parcel ./src/index.html",
+    "clean": "rm -rf dist && rm -rf .parcel-cache",
+    "build": "npm run clean && parcel build --no-source-maps"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dimslaev/overflow-nav.git"
+    "url": "git+https://github.com/dimslaev/scrollnav.git"
   },
   "author": "Dimitar Slaev <dimslaev@gmail.com>",
   "license": "ISC",
-  "homepage": "https://github.com/dimslaev/overflow-nav",
+  "homepage": "https://github.com/dimslaev/scrollnav",
   "devDependencies": {
-    "microbundle": "^0.12.0"
+    "@parcel/transformer-sass": "^2.5.0",
+    "parcel": "^2.5.0"
   },
   "dependencies": {
     "@dims/smooth-scroll-to": "0.0.1",
+    "@swc/helpers": "^0.3.13",
     "classnames": "^2.2.6",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^16.13.1",
+    "resize-observer": "^1.0.4",
     "sass": "^1.26.5"
   }
 }
