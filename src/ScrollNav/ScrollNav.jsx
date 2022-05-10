@@ -10,7 +10,7 @@ export const DIRECTION_LEFT = "left";
 export const DIRECTION_RIGHT = "right";
 
 export const isEqualArray = (arr1, arr2) => {
-  return arr1.some((el, i) => el !== arr2[i]);
+  return arr1.every((el, i) => el === arr2[i]);
 };
 
 export const ArrowIcon = (
@@ -65,7 +65,7 @@ class ScrollNav extends Component {
       listEl,
       onArrowClick,
       state: { canScroll },
-      props: { items, activeItemIndex, className, arrowIcon },
+      props: { items, className, arrowIcon },
     } = this;
 
     let hideLeftArrow = true;
@@ -113,13 +113,11 @@ class ScrollNav extends Component {
           }}
         >
           {items.map((item, index) => {
-            const classes = cn({
-              scrollnav__list__item: true,
-              "scrollnav__list__item--active": index === activeItemIndex,
-            });
-
             return (
-              <li key={`scrollnav-list-item${index}`} className={classes}>
+              <li
+                key={`scrollnav-list-item-${index}`}
+                className="scrollnav__list__item"
+              >
                 {item}
               </li>
             );
