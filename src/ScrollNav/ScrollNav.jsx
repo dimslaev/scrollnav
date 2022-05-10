@@ -2,25 +2,22 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import SmoothScrollTo from "@dims/smooth-scroll-to";
 import { ResizeObserver } from "resize-observer";
+import { ArrowIcon } from "./Icons";
 import cn from "classnames";
 import "./ScrollNav.scss";
 
-export const DEFAULT_SCROLL_STEP_SIZE = 0.5;
-export const DIRECTION_LEFT = "left";
-export const DIRECTION_RIGHT = "right";
+import {
+  DIRECTION_LEFT,
+  DIRECTION_RIGHT,
+  DEFAULT_SCROLL_STEP_SIZE,
+} from "./constants";
 
-export const isEqualArray = (arr1, arr2) => {
-  return arr1.every((el, i) => el === arr2[i]);
-};
-
-export const ArrowIcon = (
-  <svg width="7" height="12" viewBox="0 0 14 24">
-    <path
-      fill="currentColor"
-      d="M1.83 24L0 22L10 11.996L0 2L1.83 0L14 11.996L1.83 24Z"
-    />
-  </svg>
-);
+import {
+  isEqualArray,
+  getCanScroll,
+  getActiveItemScrollOffset,
+  getScrollOffset,
+} from "./methods";
 
 class ScrollNav extends Component {
   constructor(props) {
@@ -50,7 +47,7 @@ class ScrollNav extends Component {
       props: { items, activeItemIndex },
     } = this;
 
-    if (isEqualArray(prevProps.items, items)) {
+    if (!isEqualArray(prevProps.items, items)) {
       this.checkIfCanScroll();
     }
 
@@ -143,7 +140,6 @@ class ScrollNav extends Component {
 
   init = () => {
     const { containerEl, listEl } = this;
-    this.checkIfCanScroll();
 
     this.resizeObserver = new ResizeObserver(this.checkIfCanScroll);
     this.resizeObserver.observe(containerEl);
@@ -156,6 +152,8 @@ class ScrollNav extends Component {
     });
 
     listEl.addEventListener("scroll", this.onScroll);
+
+    this.checkIfCanScroll();
   };
 
   unmount = () => {
@@ -181,14 +179,13 @@ class ScrollNav extends Component {
       props: { scrollStepSize },
     } = this;
 
-    const { scrollLeft } = listEl;
-    const { offsetWidth } = containerEl;
-    const scrollSize = offsetWidth * scrollStepSize;
+    this.smoothScroll.to = getScrollOffset(
+      containerEl,
+      listEl,
+      direction,
+      scrollStepSize
+    );
 
-    this.smoothScroll.to =
-      direction === DIRECTION_RIGHT
-        ? scrollLeft + scrollSize
-        : scrollLeft - scrollSize;
     this.smoothScroll.init();
   };
 
@@ -200,38 +197,20 @@ class ScrollNav extends Component {
 
     if (!canScroll) return;
 
-    const activeEl = listEl.childNodes[index];
-    const prevEl = listEl.childNodes[index - 1];
-    let targetEl = activeEl;
-
-    if (prevEl) {
-      if (listEl.offsetWidth > activeEl.offsetWidth + prevEl.offsetWidth) {
-        targetEl = prevEl;
-      }
-    }
-
-    this.smoothScroll.to = targetEl.offsetLeft - listEl.offsetLeft;
+    this.smoothScroll.to = getActiveItemScrollOffset(listEl, index);
     this.smoothScroll.init();
   };
 
   checkIfCanScroll = () => {
     const { containerEl, listEl } = this;
-    const containerWidth = containerEl.offsetWidth;
-    const scrollWidth = listEl.scrollWidth;
-    this.setState({ canScroll: containerWidth < scrollWidth ? true : false });
+    this.setState({ canScroll: getCanScroll(containerEl, listEl) });
   };
 }
 
 ScrollNav.propTypes = {
   className: PropTypes.string,
   items: PropTypes.arrayOf(PropTypes.node).isRequired,
-  scrollStepSize: function (props, propName) {
-    if (props[propName] < MIN_SCROLL_STEP_SIZE) {
-      return new Error(
-        `scrollStepSize must be at least ${MIN_SCROLL_STEP_SIZE}.`
-      );
-    }
-  },
+  scrollStepSize: PropTypes.number,
   activeItemIndex: PropTypes.number,
 };
 

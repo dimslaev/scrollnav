@@ -1,13 +1,14 @@
 {
   "name": "@dims/scrollnav",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Nicely overflowing nav.",
   "source": "src/ScrollNav/ScrollNav.jsx",
   "main": "dist/scrollnav.js",
   "scripts": {
     "start": "parcel ./src/index.html",
     "clean": "rm -rf dist && rm -rf .parcel-cache",
-    "build": "npm run clean && parcel build --no-source-maps"
+    "build": "npm run clean && parcel build --no-source-maps",
+    "test": "tape ./src/ScrollNav/**/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,8 @@
   "homepage": "https://github.com/dimslaev/scrollnav",
   "devDependencies": {
     "@parcel/transformer-sass": "^2.5.0",
-    "parcel": "^2.5.0"
+    "parcel": "^2.5.0",
+    "tape": "^5.5.3"
   },
   "dependencies": {
     "@dims/smooth-scroll-to": "0.0.1",
