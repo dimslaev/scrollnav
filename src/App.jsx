@@ -1,59 +1,45 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import ScrollNav from "./ScrollNav/ScrollNav";
 import cn from "classnames";
 import "./style.scss";
 
-export class App extends Component {
-  state = {
-    activeItemIndex: 0,
-  };
+export function App() {
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
 
-  onItemClick = (index) => {
-    this.setState({ activeItemIndex: index });
-  };
-
-  renderItems = () => {
-    const {
-      onItemClick,
-      state: { activeItemIndex },
-    } = this;
-
-    return [...Array(8).keys()].map((_, i) => {
-      const classes = cn({
-        item: true,
-        "item--active": i === activeItemIndex,
-        "item--first": i === 0,
-        "item--last": i === 7,
-      });
-      return (
-        <button className={classes} onClick={() => onItemClick(i)}>
-          Item {i + 1}
-        </button>
-      );
-    });
-  };
-
-  render() {
-    const {
-      renderItems,
-      state: { activeItemIndex },
-    } = this;
-
-    return (
-      <div className="container">
-        <h1 className="title">ScrollNav</h1>
-
-        <div className="preview">
-          <ScrollNav
-            className="nav"
-            scrollStepSize={0.5}
-            items={renderItems()}
-            activeItemIndex={activeItemIndex}
-          />
-        </div>
-      </div>
-    );
+  function onItemClick(e) {
+    setActiveItemIndex(parseInt(e.target.dataset.index));
   }
+
+  return (
+    <div className="container">
+      <h1 className="title">ScrollNav</h1>
+
+      <div className="preview">
+        <ScrollNav
+          className="nav"
+          scrollStepSize={0.5}
+          activeItemIndex={activeItemIndex}
+        >
+          {[...Array(8).keys()].map((_, i) => {
+            const classes = cn({
+              item: true,
+              "item--active": i === activeItemIndex,
+            });
+            return (
+              <button
+                className={classes}
+                data-index={i}
+                onClick={onItemClick}
+                key={`item-${i}`}
+              >
+                Item {i + 1}
+              </button>
+            );
+          })}
+        </ScrollNav>
+      </div>
+    </div>
+  );
 }
 
 export default App;

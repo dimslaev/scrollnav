@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React, { memo, forwardRef, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import SmoothScrollTo from "@dims/smooth-scroll-to";
 import { ResizeObserver } from "resize-observer";
-import { ArrowIcon } from "./Icons";
+import { LeftArrowIcon, RightArrowIcon } from "./Icons";
 import cn from "classnames";
 import "./ScrollNav.scss";
 
@@ -12,204 +12,162 @@ import {
   DEFAULT_SCROLL_STEP_SIZE,
 } from "./constants";
 
-import {
-  isEqualArray,
-  getCanScroll,
-  getActiveItemScrollOffset,
-  getScrollOffset,
-} from "./methods";
+import { getItemOffsetLeft, getScrollOffset } from "./methods";
 
-class ScrollNav extends Component {
-  constructor(props) {
-    super(props);
+function ScrollNav({
+  className,
+  children,
+  activeItemIndex = 0,
+  scrollStepSize = DEFAULT_SCROLL_STEP_SIZE,
+  leftArrowIcon,
+  rightArrowIcon,
+}) {
+  const [canScroll, setCanScroll] = useState(false);
+  const [lastScrollLeft, setLastScrollLeft] = useState(0);
 
-    this.state = {
-      canScroll: false,
-      lastScrollLeft: 0,
+  const outerRef = useRef(null);
+  const innerRef = useRef(null);
+  const resizeObserver = useRef(null);
+  const smoothScroll = useRef(null);
+
+  const checkIfCanScroll = () => {
+    setCanScroll(innerRef.current.scrollWidth > outerRef.current.offsetWidth);
+  };
+
+  const onScroll = () => {
+    setLastScrollLeft((lastScrollLeft.current = innerRef.current.scrollLeft));
+  };
+
+  useEffect(() => {
+    checkIfCanScroll();
+  }, [children]);
+
+  useEffect(() => {
+    if (!outerRef.current) return;
+
+    resizeObserver.current = new ResizeObserver(checkIfCanScroll);
+    resizeObserver.current.observe(outerRef.current);
+
+    return () => {
+      resizeObserver.current.disconnect();
     };
+  }, [outerRef.current]);
 
-    this.containerEl = null;
-    this.listEl = null;
-    this.resizeObserver = null;
-    this.smoothScroll = null;
-  }
+  useEffect(() => {
+    if (!innerRef.current) return;
 
-  componentDidMount() {
-    this.init();
-  }
-
-  componentWillUnmount() {
-    this.unmount();
-  }
-
-  componentDidUpdate(prevProps) {
-    const {
-      props: { items, activeItemIndex },
-    } = this;
-
-    if (!isEqualArray(prevProps.items, items)) {
-      this.checkIfCanScroll();
-    }
-
-    if (prevProps.activeItemIndex !== activeItemIndex) {
-      this.scrollToActiveItem(activeItemIndex);
-    }
-  }
-
-  render() {
-    const {
-      containerEl,
-      listEl,
-      onArrowClick,
-      state: { canScroll },
-      props: { items, className, arrowIcon },
-    } = this;
-
-    let hideLeftArrow = true;
-    let hideRightArrow = true;
-
-    if (listEl && containerEl) {
-      hideLeftArrow = listEl.scrollLeft === 0;
-      hideRightArrow =
-        listEl.scrollLeft === listEl.scrollWidth - listEl.offsetWidth;
-    }
-
-    const containerClasses = cn({
-      scrollnav: true,
-      [className]: typeof className === "string" && className.length > 0,
-    });
-
-    const listClasses = cn({
-      scrollnav__list: true,
-      "scrollnav__list--scrollable": canScroll,
-    });
-
-    const buttonLeftClasses = cn({
-      scrollnav__button: true,
-      "scrollnav__button--left": true,
-      "scrollnav__button--hidden": hideLeftArrow,
-    });
-
-    const buttonRightClasses = cn({
-      scrollnav__button: true,
-      "scrollnav__button--right": true,
-      "scrollnav__button--hidden": hideRightArrow,
-    });
-
-    return (
-      <nav
-        className={containerClasses}
-        ref={(node) => {
-          this.containerEl = node;
-        }}
-      >
-        <ul
-          className={listClasses}
-          ref={(node) => {
-            this.listEl = node;
-          }}
-        >
-          {items.map((item, index) => {
-            return (
-              <li
-                key={`scrollnav-list-item-${index}`}
-                className="scrollnav__list__item"
-              >
-                {item}
-              </li>
-            );
-          })}
-        </ul>
-
-        <button
-          className={buttonLeftClasses}
-          onClick={onArrowClick(DIRECTION_LEFT)}
-        >
-          {arrowIcon || ArrowIcon}
-        </button>
-
-        <button
-          className={buttonRightClasses}
-          onClick={onArrowClick(DIRECTION_RIGHT)}
-        >
-          {arrowIcon || ArrowIcon}
-        </button>
-      </nav>
-    );
-  }
-
-  init = () => {
-    const { containerEl, listEl } = this;
-
-    this.resizeObserver = new ResizeObserver(this.checkIfCanScroll);
-    this.resizeObserver.observe(containerEl);
-
-    this.smoothScroll = new SmoothScrollTo({
-      target: listEl,
+    smoothScroll.current = new SmoothScrollTo({
+      target: innerRef.current,
       axis: "x",
       to: 0,
       duration: 150,
     });
 
-    listEl.addEventListener("scroll", this.onScroll);
+    innerRef.current.addEventListener("scroll", onScroll);
 
-    this.checkIfCanScroll();
-  };
+    return () => {
+      innerRef.current.removeEventListener("scroll", onScroll);
+    };
+  }, [innerRef.current]);
 
-  unmount = () => {
-    const { listEl } = this;
-    this.resizeObserver.disconnect();
-    listEl.removeEventListener("scroll", this.onScroll);
-  };
+  useEffect(() => {
+    scrollToActiveItem(activeItemIndex);
+  }, [activeItemIndex]);
 
-  onScroll = () => {
-    const {
-      listEl: { scrollLeft },
-    } = this;
-
-    this.setState({
-      lastScrollLeft: scrollLeft,
-    });
-  };
-
-  onArrowClick = (direction) => () => {
-    const {
-      containerEl,
-      listEl,
-      props: { scrollStepSize },
-    } = this;
-
-    this.smoothScroll.to = getScrollOffset(
-      containerEl,
-      listEl,
+  const onArrowClick = (direction) => () => {
+    smoothScroll.current.to = getScrollOffset(
+      outerRef.current,
+      innerRef.current,
       direction,
       scrollStepSize
     );
 
-    this.smoothScroll.init();
+    smoothScroll.current.init();
   };
 
-  scrollToActiveItem = (index) => {
-    const {
-      state: { canScroll },
-      listEl,
-    } = this;
-
+  const scrollToActiveItem = (index) => {
     if (!canScroll) return;
-
-    this.smoothScroll.to = getActiveItemScrollOffset(listEl, index);
-    this.smoothScroll.init();
+    smoothScroll.current.to = getItemOffsetLeft(innerRef.current, index);
+    smoothScroll.current.init();
   };
 
-  checkIfCanScroll = () => {
-    const { containerEl, listEl } = this;
-    this.setState({ canScroll: getCanScroll(containerEl, listEl) });
-  };
+  let hideLeftArrow = false;
+  let hideRightArrow = false;
+
+  if (innerRef.current && outerRef.current) {
+    hideLeftArrow = innerRef.current.scrollLeft === 0;
+    hideRightArrow =
+      Math.ceil(innerRef.current.scrollLeft) >=
+      innerRef.current.scrollWidth - innerRef.current.offsetWidth;
+  }
+
+  const outerClasses = cn({
+    scrollnav: true,
+    [className]: typeof className === "string" && className.length > 0,
+  });
+
+  const buttonLeftClasses = cn({
+    scrollnav__button: true,
+    "scrollnav__button--left": true,
+    "scrollnav__button--hidden": hideLeftArrow,
+  });
+
+  const buttonRightClasses = cn({
+    scrollnav__button: true,
+    "scrollnav__button--right": true,
+    "scrollnav__button--hidden": hideRightArrow,
+  });
+
+  return (
+    <nav className={outerClasses} ref={outerRef}>
+      <Inner ref={innerRef} canScroll={canScroll}>
+        {children}
+      </Inner>
+
+      <button
+        className={buttonLeftClasses}
+        onClick={onArrowClick(DIRECTION_LEFT)}
+      >
+        {leftArrowIcon || LeftArrowIcon}
+      </button>
+
+      <button
+        className={buttonRightClasses}
+        onClick={onArrowClick(DIRECTION_RIGHT)}
+      >
+        {rightArrowIcon || RightArrowIcon}
+      </button>
+    </nav>
+  );
 }
+
+const Inner = memo(
+  forwardRef(({ children, canScroll }, ref) => {
+    const innerClasses = cn({
+      scrollnav__list: true,
+      "scrollnav__list--scrollable": canScroll,
+    });
+
+    return (
+      <ul className={innerClasses} ref={ref}>
+        {children.map((item, index) => {
+          return (
+            <li
+              key={`scrollnav-item-${index}`}
+              className="scrollnav__list__item"
+            >
+              {item}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  })
+);
 
 ScrollNav.propTypes = {
   className: PropTypes.string,
-  items: PropTypes.arrayOf(PropTypes.node).isRequired,
+  children: PropTypes.arrayOf(PropTypes.node).isRequired,
   scrollStepSize: PropTypes.number,
   activeItemIndex: PropTypes.number,
 };
