@@ -1,7 +1,22 @@
-const { DIRECTION_RIGHT } = require("./constants");
+const debounce = (fn, wait = 1) => {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.call(this, ...args), wait);
+  };
+};
 
-const isEqualArray = (arr1, arr2) => {
-  return arr1.every((el, i) => el === arr2[i]);
+const getCanScroll = (inner, outer) => {
+  if (inner.scrollWidth <= outer.offsetWidth) {
+    return "";
+  }
+  if (inner.scrollLeft === 0) {
+    return "right";
+  }
+  if (Math.ceil(inner.scrollLeft) >= inner.scrollWidth - inner.offsetWidth) {
+    return "left";
+  }
+  return "left,right";
 };
 
 const getItemOffsetLeft = (inner, index) => {
@@ -22,7 +37,7 @@ const getScrollOffset = (outer, inner, direction, scrollStepSize) => {
   const scrollSize = outer.offsetWidth * scrollStepSize;
   let distance = 0;
 
-  if (direction === DIRECTION_RIGHT) {
+  if (direction === "right") {
     distance = inner.scrollLeft + scrollSize;
   } else {
     distance = inner.scrollLeft - scrollSize;
@@ -32,7 +47,8 @@ const getScrollOffset = (outer, inner, direction, scrollStepSize) => {
 };
 
 module.exports = {
-  isEqualArray,
+  debounce,
+  getCanScroll,
   getItemOffsetLeft,
   getScrollOffset,
 };

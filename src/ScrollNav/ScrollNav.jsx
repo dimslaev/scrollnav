@@ -6,55 +6,39 @@ import { LeftArrowIcon, RightArrowIcon } from "./Icons";
 import cn from "classnames";
 import "./ScrollNav.scss";
 
-import {
-  DIRECTION_LEFT,
-  DIRECTION_RIGHT,
-  DEFAULT_SCROLL_STEP_SIZE,
-} from "./constants";
+import { getItemOffsetLeft, getScrollOffset, getCanScroll } from "./methods";
 
-import { getItemOffsetLeft, getScrollOffset } from "./methods";
+const useIsInitialRender = () => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = true;
+  }, []);
+  return !ref.current;
+};
 
 function ScrollNav({
   className,
   children,
   activeItemIndex = 0,
-  scrollStepSize = DEFAULT_SCROLL_STEP_SIZE,
+  scrollStepSize = 0.5,
   leftArrowIcon,
   rightArrowIcon,
+  triggerUpdate = false,
 }) {
-  const [canScroll, setCanScroll] = useState(false);
-  const [lastScrollLeft, setLastScrollLeft] = useState(0);
+  const [canScroll, setCanScroll] = useState("left,right");
+  const isInitialRender = useIsInitialRender();
+  const outerRef = useRef();
+  const innerRef = useRef();
+  const resizeObserver = useRef();
+  const smoothScroll = useRef();
 
-  const outerRef = useRef(null);
-  const innerRef = useRef(null);
-  const resizeObserver = useRef(null);
-  const smoothScroll = useRef(null);
-
-  const checkIfCanScroll = () => {
-    setCanScroll(innerRef.current.scrollWidth > outerRef.current.offsetWidth);
-  };
-
-  const onScroll = () => {
-    setLastScrollLeft((lastScrollLeft.current = innerRef.current.scrollLeft));
+  const update = () => {
+    setCanScroll(getCanScroll(innerRef.current, outerRef.current));
   };
 
   useEffect(() => {
-    checkIfCanScroll();
-  }, [children]);
-
-  useEffect(() => {
-    if (!outerRef.current) return;
-
-    resizeObserver.current = new ResizeObserver(checkIfCanScroll);
+    resizeObserver.current = new ResizeObserver(update);
     resizeObserver.current.observe(outerRef.current);
-
-    return () => {
-      resizeObserver.current.disconnect();
-    };
-  }, [outerRef.current]);
-
-  useEffect(() => {
-    if (!innerRef.current) return;
 
     smoothScroll.current = new SmoothScrollTo({
       target: innerRef.current,
@@ -63,16 +47,21 @@ function ScrollNav({
       duration: 150,
     });
 
-    innerRef.current.addEventListener("scroll", onScroll);
+    innerRef.current.addEventListener("scroll", update);
 
     return () => {
-      innerRef.current.removeEventListener("scroll", onScroll);
+      innerRef.current.removeEventListener("scroll", update);
+      resizeObserver.current.disconnect();
     };
-  }, [innerRef.current]);
+  }, []);
 
   useEffect(() => {
     scrollToActiveItem(activeItemIndex);
   }, [activeItemIndex]);
+
+  useEffect(() => {
+    if (!isInitialRender) update();
+  }, [triggerUpdate]);
 
   const onArrowClick = (direction) => () => {
     smoothScroll.current.to = getScrollOffset(
@@ -91,16 +80,6 @@ function ScrollNav({
     smoothScroll.current.init();
   };
 
-  let hideLeftArrow = false;
-  let hideRightArrow = false;
-
-  if (innerRef.current && outerRef.current) {
-    hideLeftArrow = innerRef.current.scrollLeft === 0;
-    hideRightArrow =
-      Math.ceil(innerRef.current.scrollLeft) >=
-      innerRef.current.scrollWidth - innerRef.current.offsetWidth;
-  }
-
   const outerClasses = cn({
     scrollnav: true,
     [className]: typeof className === "string" && className.length > 0,
@@ -109,13 +88,13 @@ function ScrollNav({
   const buttonLeftClasses = cn({
     scrollnav__button: true,
     "scrollnav__button--left": true,
-    "scrollnav__button--hidden": hideLeftArrow,
+    "scrollnav__button--hidden": !canScroll.includes("left"),
   });
 
   const buttonRightClasses = cn({
     scrollnav__button: true,
     "scrollnav__button--right": true,
-    "scrollnav__button--hidden": hideRightArrow,
+    "scrollnav__button--hidden": !canScroll.includes("right"),
   });
 
   return (
@@ -124,17 +103,11 @@ function ScrollNav({
         {children}
       </Inner>
 
-      <button
-        className={buttonLeftClasses}
-        onClick={onArrowClick(DIRECTION_LEFT)}
-      >
+      <button className={buttonLeftClasses} onClick={onArrowClick("left")}>
         {leftArrowIcon || LeftArrowIcon}
       </button>
 
-      <button
-        className={buttonRightClasses}
-        onClick={onArrowClick(DIRECTION_RIGHT)}
-      >
+      <button className={buttonRightClasses} onClick={onArrowClick("right")}>
         {rightArrowIcon || RightArrowIcon}
       </button>
     </nav>
@@ -170,10 +143,7 @@ ScrollNav.propTypes = {
   children: PropTypes.arrayOf(PropTypes.node).isRequired,
   scrollStepSize: PropTypes.number,
   activeItemIndex: PropTypes.number,
-};
-
-ScrollNav.defaultProps = {
-  scrollStepSize: DEFAULT_SCROLL_STEP_SIZE,
+  triggerUpdate: PropTypes.bool,
 };
 
 export default ScrollNav;

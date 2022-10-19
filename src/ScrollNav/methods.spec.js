@@ -1,5 +1,4 @@
 const test = require("tape");
-const { DIRECTION_RIGHT, DIRECTION_LEFT } = require("./constants");
 const { getItemOffsetLeft, getScrollOffset } = require("./methods");
 
 test("getItemOffsetLeft", function (t) {
@@ -31,9 +30,9 @@ test("getScrollOffset", function (t) {
   const inner = { scrollLeft: 20 };
   const scrollStepSize = 0.1; // 10% of outer.offsetWidth
 
-  t.equal(getScrollOffset(outer, inner, DIRECTION_RIGHT, scrollStepSize), 30);
+  t.equal(getScrollOffset(outer, inner, "right", scrollStepSize), 30);
 
-  t.equal(getScrollOffset(outer, inner, DIRECTION_LEFT, scrollStepSize), 10);
+  t.equal(getScrollOffset(outer, inner, "left", scrollStepSize), 10);
 
   t.end();
 });
