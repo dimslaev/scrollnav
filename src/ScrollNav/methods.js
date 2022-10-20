@@ -6,7 +6,7 @@ const debounce = (fn, wait = 1) => {
   };
 };
 
-const getCanScroll = (inner, outer) => {
+const getCanScroll = (outer, inner) => {
   if (inner.scrollWidth <= outer.offsetWidth) {
     return "";
   }
@@ -46,9 +46,40 @@ const getScrollOffset = (outer, inner, direction, scrollStepSize) => {
   return distance;
 };
 
+const applyStyles = (outer, inner) => {
+  outer.className = "scrollnav";
+  inner.className = "scrollnav__inner";
+
+  const style = document.createElement("style");
+  document.head.appendChild(style);
+
+  style.innerHTML = `
+    .scrollnav {
+      position: relative;
+    }
+    .scrollnav__inner {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow: auto;
+    }
+    .scrollnav__inner::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollnav__inner > * {
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+      position: relative;
+    }
+  `;
+};
+
 module.exports = {
   debounce,
   getCanScroll,
   getItemOffsetLeft,
   getScrollOffset,
+  applyStyles,
 };
