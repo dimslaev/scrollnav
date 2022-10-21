@@ -1,7 +1,7 @@
 const test = require("tape");
-const { getItemOffsetLeft, getScrollOffset } = require("./methods");
+const { getItemOffset, getScrollOffset } = require("./methods");
 
-test("getItemOffsetLeft", function (t) {
+test("getItemOffset", function (t) {
   const inner = {
     offsetLeft: 100,
     childNodes: [
@@ -19,15 +19,15 @@ test("getItemOffsetLeft", function (t) {
       },
     ],
   };
-  t.equal(getItemOffsetLeft(inner, 0), -100);
-  t.equal(getItemOffsetLeft(inner, 1), -60);
-  t.equal(getItemOffsetLeft(inner, 2), 100);
+  t.equal(getItemOffset(inner, 0), -100);
+  t.equal(getItemOffset(inner, 1), -60);
+  t.equal(getItemOffset(inner, 2), 100);
   t.end();
 });
 
 test("getScrollOffset", function (t) {
   const outer = { offsetWidth: 100 };
-  const inner = { scrollLeft: 20 };
+  const inner = { scrollPrev: 20 };
   const scrollStepSize = 0.1; // 10% of outer.offsetWidth
 
   t.equal(getScrollOffset(outer, inner, "right", scrollStepSize), 30);

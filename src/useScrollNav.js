@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useIsInitialRender } from "./useIsInitialRender";
 import {
-  getItemOffsetLeft,
+  getItemOffset,
   getScrollOffset,
   getCanScroll,
   applyStyles,
@@ -11,39 +11,39 @@ import SmoothScrollTo from "@dims/smooth-scroll-to";
 import { ResizeObserver } from "resize-observer";
 
 export const useScrollNav = ({
-  navRef,
+  listRef,
   scrollStepSize = 0.5,
   triggerUpdate = () => {},
 }) => {
-  const [canScroll, setCanScroll] = useState("left,right");
+  const [canScroll, setCanScroll] = useState("prev,next");
   const isInitialRender = useIsInitialRender();
   const resizeObserver = useRef();
   const smoothScroll = useRef();
 
   const update = () => {
-    if (!navRef.current) return;
-    setCanScroll(getCanScroll(navRef.current));
+    if (!listRef.current) return;
+    setCanScroll(getCanScroll(listRef.current));
   };
 
   useEffect(() => {
-    if (!navRef.current) return;
+    if (!listRef.current) return;
 
-    applyStyles(navRef.current);
+    applyStyles(listRef.current);
 
     resizeObserver.current = new ResizeObserver(update);
-    resizeObserver.current.observe(navRef.current);
+    resizeObserver.current.observe(listRef.current);
 
     smoothScroll.current = new SmoothScrollTo({
-      target: navRef.current,
+      target: listRef.current,
       axis: "x",
       to: 0,
       duration: 150,
     });
 
-    navRef.current.addEventListener("scroll", update);
+    listRef.current.addEventListener("scroll", update);
 
     return () => {
-      navRef.current.removeEventListener("scroll", update);
+      listRef.current.removeEventListener("scroll", update);
       resizeObserver.current.disconnect();
     };
   }, []);
@@ -57,31 +57,31 @@ export const useScrollNav = ({
     smoothScroll.current.init();
   };
 
-  const scrollLeft = () => {
-    if (!navRef.current || !canScroll) return;
+  const scrollPrev = () => {
+    if (!listRef.current || !canScroll) return;
 
-    scroll(getScrollOffset(navRef.current, "left", scrollStepSize));
+    scroll(getScrollOffset(listRef.current, "prev", scrollStepSize));
   };
 
-  const scrollRight = () => {
-    if (!navRef.current || !canScroll) return;
+  const scrollNext = () => {
+    if (!listRef.current || !canScroll) return;
 
-    scroll(getScrollOffset(navRef.current, "right", scrollStepSize));
+    scroll(getScrollOffset(listRef.current, "next", scrollStepSize));
   };
 
   const scrollToChildIndex = (index) => {
-    if (!navRef.current || !canScroll || typeof index !== "number") {
+    if (!listRef.current || !canScroll || typeof index !== "number") {
       return;
     }
 
-    scroll(getItemOffsetLeft(navRef.current, index));
+    scroll(getItemOffset(listRef.current, index));
   };
 
   return {
-    canScrollLeft: canScroll.includes("left"),
-    canScrollRight: canScroll.includes("right"),
-    scrollLeft,
-    scrollRight,
+    canScrollPrev: canScroll.includes("prev"),
+    canScrollNext: canScroll.includes("next"),
+    scrollPrev,
+    scrollNext,
     scrollToChildIndex,
   };
 };
