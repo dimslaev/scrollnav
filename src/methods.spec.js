@@ -1,8 +1,25 @@
 const test = require("tape");
-const { getItemOffset, getScrollOffset } = require("./methods");
+const { getCanScroll, getItemOffset, getTargetOffset } = require("./methods");
+
+test("getCanScroll", function (t) {
+  const el = {
+    parentNode: {
+      offsetWidth: 30,
+    },
+    scrollWidth: 40,
+    scrollLeft: 0,
+  };
+
+  t.equal(getCanScroll(el), "next");
+  t.equal(getCanScroll({ ...el, scrollLeft: 5 }), "prev,next");
+  t.equal(getCanScroll({ ...el, scrollLeft: 10 }), "prev");
+  t.equal(getCanScroll({ ...el, scrollLeft: 9.5 }), "prev");
+  t.equal(getCanScroll({ ...el, scrollWidth: 30 }), "");
+  t.end();
+});
 
 test("getItemOffset", function (t) {
-  const inner = {
+  const el = {
     offsetLeft: 100,
     childNodes: [
       {
@@ -19,20 +36,18 @@ test("getItemOffset", function (t) {
       },
     ],
   };
-  t.equal(getItemOffset(inner, 0), -100);
-  t.equal(getItemOffset(inner, 1), -60);
-  t.equal(getItemOffset(inner, 2), 100);
+
+  t.equal(getItemOffset(el, 0), -100);
+  t.equal(getItemOffset(el, 1), -60);
+  t.equal(getItemOffset(el, 2), 100);
   t.end();
 });
 
-test("getScrollOffset", function (t) {
-  const outer = { offsetWidth: 100 };
-  const inner = { scrollPrev: 20 };
-  const scrollStepSize = 0.1; // 10% of outer.offsetWidth
+test("getTargetOffset", function (t) {
+  const el = { scrollLeft: 20, parentNode: { offsetWidth: 100 } };
+  const scrollStepSize = 0.1; // 10% of parentNode.offsetWidth
 
-  t.equal(getScrollOffset(outer, inner, "right", scrollStepSize), 30);
-
-  t.equal(getScrollOffset(outer, inner, "left", scrollStepSize), 10);
-
+  t.equal(getTargetOffset(el, "next", scrollStepSize), 30);
+  t.equal(getTargetOffset(el, "prev", scrollStepSize), 10);
   t.end();
 });

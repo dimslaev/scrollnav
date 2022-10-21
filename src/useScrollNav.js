@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useIsInitialRender } from "./useIsInitialRender";
 import {
   getItemOffset,
-  getScrollOffset,
+  getTargetOffset,
   getCanScroll,
   applyStyles,
 } from "./methods";
@@ -60,13 +60,13 @@ export const useScrollNav = ({
   const scrollPrev = () => {
     if (!listRef.current || !canScroll) return;
 
-    scroll(getScrollOffset(listRef.current, "prev", scrollStepSize));
+    scroll(getTargetOffset(listRef.current, "prev", scrollStepSize));
   };
 
   const scrollNext = () => {
     if (!listRef.current || !canScroll) return;
 
-    scroll(getScrollOffset(listRef.current, "next", scrollStepSize));
+    scroll(getTargetOffset(listRef.current, "next", scrollStepSize));
   };
 
   const scrollToChildIndex = (index) => {

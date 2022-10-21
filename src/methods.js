@@ -5,7 +5,7 @@ const getCanScroll = (el) => {
   if (el.scrollLeft === 0) {
     return "next";
   }
-  if (Math.ceil(el.scrollLeft) >= el.scrollWidth - el.offsetWidth) {
+  if (Math.ceil(el.scrollLeft) >= el.scrollWidth - el.parentNode.offsetWidth) {
     return "prev";
   }
   return "prev,next";
@@ -25,7 +25,7 @@ const getItemOffset = (el, index) => {
   return targetEl.offsetLeft - el.offsetLeft;
 };
 
-const getScrollOffset = (el, direction, scrollStepSize) => {
+const getTargetOffset = (el, direction, scrollStepSize) => {
   const scrollSize = el.parentNode.offsetWidth * scrollStepSize;
   let distance = 0;
 
@@ -67,6 +67,6 @@ const applyStyles = (el) => {
 module.exports = {
   getCanScroll,
   getItemOffset,
-  getScrollOffset,
+  getTargetOffset,
   applyStyles,
 };
