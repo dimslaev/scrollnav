@@ -11,10 +11,9 @@ import SmoothScrollTo from "@dims/smooth-scroll-to";
 import { ResizeObserver } from "resize-observer";
 
 export const useScrollNav = ({
-  outerRef,
-  innerRef,
+  navRef,
   scrollStepSize = 0.5,
-  triggerUpdate,
+  triggerUpdate = () => {},
 }) => {
   const [canScroll, setCanScroll] = useState("left,right");
   const isInitialRender = useIsInitialRender();
@@ -22,29 +21,29 @@ export const useScrollNav = ({
   const smoothScroll = useRef();
 
   const update = () => {
-    if (!outerRef.current || !innerRef.current) return;
-    setCanScroll(getCanScroll(outerRef.current, innerRef.current));
+    if (!navRef.current) return;
+    setCanScroll(getCanScroll(navRef.current));
   };
 
   useEffect(() => {
-    if (!outerRef.current || !innerRef.current) return;
+    if (!navRef.current) return;
 
-    applyStyles(outerRef.current, innerRef.current);
+    applyStyles(navRef.current);
 
     resizeObserver.current = new ResizeObserver(update);
-    resizeObserver.current.observe(outerRef.current);
+    resizeObserver.current.observe(navRef.current);
 
     smoothScroll.current = new SmoothScrollTo({
-      target: innerRef.current,
+      target: navRef.current,
       axis: "x",
       to: 0,
       duration: 150,
     });
 
-    innerRef.current.addEventListener("scroll", update);
+    navRef.current.addEventListener("scroll", update);
 
     return () => {
-      innerRef.current.removeEventListener("scroll", update);
+      navRef.current.removeEventListener("scroll", update);
       resizeObserver.current.disconnect();
     };
   }, []);
@@ -59,49 +58,30 @@ export const useScrollNav = ({
   };
 
   const scrollLeft = () => {
-    if (!outerRef.current || !innerRef.current || !canScroll) return;
+    if (!navRef.current || !canScroll) return;
 
-    scroll(
-      getScrollOffset(
-        outerRef.current,
-        innerRef.current,
-        "left",
-        scrollStepSize
-      )
-    );
+    scroll(getScrollOffset(navRef.current, "left", scrollStepSize));
   };
 
-  const scrollLRight = () => {
-    if (!outerRef.current || !innerRef.current || !canScroll) return;
+  const scrollRight = () => {
+    if (!navRef.current || !canScroll) return;
 
-    scroll(
-      getScrollOffset(
-        outerRef.current,
-        innerRef.current,
-        "right",
-        scrollStepSize
-      )
-    );
+    scroll(getScrollOffset(navRef.current, "right", scrollStepSize));
   };
 
   const scrollToChildIndex = (index) => {
-    if (
-      !outerRef.current ||
-      !innerRef.current ||
-      !canScroll ||
-      typeof index !== "number"
-    ) {
+    if (!navRef.current || !canScroll || typeof index !== "number") {
       return;
     }
 
-    scroll(getItemOffsetLeft(innerRef.current, index));
+    scroll(getItemOffsetLeft(navRef.current, index));
   };
 
   return {
     canScrollLeft: canScroll.includes("left"),
     canScrollRight: canScroll.includes("right"),
     scrollLeft,
-    scrollLRight,
+    scrollRight,
     scrollToChildIndex,
   };
 };
