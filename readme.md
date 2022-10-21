@@ -1,4 +1,4 @@
-### Scrollnav
+### Scrollnav v1.2.1
 
 The `useScrollNav` hook allows you to add a scrollable wrapper around nav items while giving you full control over the UI.
 
@@ -11,6 +11,8 @@ npm i @dims/scrollnav
 #### Usage
 
 ```javascript
+import { useScrollNav } from '@dims/scrollnav';
+
 const ExampleNavComponent = () => {
   const listRef = React.useRef();
 
@@ -28,7 +30,7 @@ const ExampleNavComponent = () => {
       </ul>
 
       {canScrollPrev && <button onClick={scrollPrev}><</button>}
-      {canScrollNext && <button onClick={scrollNext}><</button>}
+      {canScrollNext && <button onClick={scrollNext}>></button>}
     </nav>
   );
 };
