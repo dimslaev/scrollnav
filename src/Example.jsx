@@ -16,14 +16,10 @@ export const Example = () => {
   } = useScrollNav({ listRef });
 
   const onItemClick = (e) => {
-    setActiveItemIndex(parseInt(e.target.dataset.index));
+    const index = parseInt(e.target.dataset.index);
+    setActiveItemIndex(index);
+    scrollToChildIndex(index);
   };
-
-  React.useEffect(() => {
-    if (typeof activeItemIndex === "number") {
-      scrollToChildIndex(activeItemIndex);
-    }
-  }, [activeItemIndex]);
 
   return (
     <main>
