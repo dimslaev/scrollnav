@@ -1,4 +1,7 @@
-$unit: 8px;
+$nav-height: 2rem;
+$nav-control-width: $nav-height;
+$nav-control-height: $nav-height;
+
 $color-background: #151c26;
 $color-foreground: #74838c;
 $color-active: #bfb7a8;
@@ -9,45 +12,91 @@ body {
   font-family: sans-serif;
 }
 
-.container {
+main {
   text-align: center;
-  padding: 80px;
+  padding: 2rem;
 }
 
-.title {
-  margin-bottom: $unit * 4;
-  font-size: $unit * 3;
+h1 {
+  margin-bottom: 4rem;
+  font-size: 3rem;
   font-weight: bold;
   letter-spacing: 1px;
   color: $color-active;
 }
 
-.preview {
+.nav {
+  position: relative;
   width: 100%;
-  max-width: $unit * 40;
+  height: $nav-height;
+  max-width: 20rem;
   margin: 0 auto;
+  padding: 0 $nav-control-width * 0.25;
 }
 
-.item {
-  margin-right: $unit * 2;
+.nav-list-item {
+  margin-right: 0.5rem;
+
+  button {
+    user-select: none;
+    cursor: pointer;
+    appearance: none;
+
+    border: 0;
+
+    height: $nav-height;
+    padding: 0.5rem;
+
+    color: inherit;
+    background: transparent;
+
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.active,
+  &:hover {
+    color: $color-active;
+  }
+}
+
+.nav-control {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0;
+  width: $nav-control-width;
+  height: $nav-control-height;
 
   color: inherit;
   user-select: none;
   cursor: pointer;
   appearance: none;
-  background: transparent;
+  -webkit-appearance: none;
   border: 0;
 
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-
-  &--last {
-    margin-right: 0;
+  &:focus {
+    outline: 0;
   }
 
-  &--active,
-  &:hover {
-    color: $color-active;
+  &.prev {
+    left: 0;
+    justify-content: flex-start;
+    background: linear-gradient(90deg, $color-background, transparent);
+  }
+
+  &.next {
+    right: 0;
+    justify-content: flex-end;
+    background: linear-gradient(90deg, transparent, $color-background);
   }
 }
