@@ -1,4 +1,4 @@
-### Scrollnav v1.2.1
+### Scrollnav v1.2.2
 
 The `useScrollNav` hook allows you to add a scrollable wrapper around nav items while giving you full control over the UI.
 
