@@ -1,6 +1,6 @@
 {
-  "name": "@dims/scrollnav",
-  "version": "1.2.2",
+  "name": "@dims/virtualist",
+  "version": "0.0.1",
   "description": "Nicely overflowing nav.",
   "source": "src/useScrollNav.js",
   "main": "dist/scrollnav.js",
