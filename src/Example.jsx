@@ -1,151 +1,69 @@
-import React, { useEffect, useRef, forwardRef, useState } from "react";
-import data from "../MOCK_DATA.json";
+import React from "react";
+import { useScrollNav } from "./useScrollNav";
 import "./style.scss";
 
 export const Example = () => {
+  const [activeItemIndex, setActiveItemIndex] = React.useState(0);
+
+  const listRef = React.useRef();
+
+  const {
+    canScrollPrev,
+    canScrollNext,
+    scrollPrev,
+    scrollNext,
+    scrollToChildIndex,
+  } = useScrollNav({ listRef });
+
+  const onItemClick = (e) => {
+    const index = parseInt(e.target.dataset.index);
+    setActiveItemIndex(index);
+    scrollToChildIndex(index);
+  };
+
   return (
     <main>
-      <div className="list-wrapper">
-        <List items={data} visibleCount={20} />
-      </div>
+      <h1>ScrollNav</h1>
+
+      <nav className="nav">
+        <ul className="nav-list" ref={listRef}>
+          {[...Array(8).keys()].map((_, i) => (
+            <li
+              key={`item-${i}`}
+              className={`nav-list-item${
+                i === activeItemIndex ? " active" : ""
+              }`}
+            >
+              <button onClick={onItemClick} data-index={i}>
+                Item {i + 1}
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        {canScrollPrev && (
+          <button className="nav-control prev" onClick={scrollPrev}>
+            <ArrowIcon style={{ transform: "rotate(-180deg)" }} />
+          </button>
+        )}
+
+        {canScrollNext && (
+          <button className="nav-control next" onClick={scrollNext}>
+            <ArrowIcon />
+          </button>
+        )}
+      </nav>
     </main>
   );
 };
 
-const CUSHION = 200;
-
-const getChunkTotalHeight = (heights) => {
-  let result = 0;
-  heights.forEach((height) => {
-    result += height;
-  });
-  return result;
-};
-
-export const List = forwardRef(({ items, visibleCount }, ref) => {
-  const listRef = useRef(null);
-  const spacerTopRef = useRef(null);
-  const spacerBottomRef = useRef(null);
-  const visibleItemsHeightsRef = useRef([]);
-
-  const lastScrollPosition = useRef(0);
-
-  const [chunkIndex, setChunkIndex] = useState(1);
-
-  const [visibleItems, setVisibleItems] = useState(
-    items.filter((_, index) => index < visibleCount)
-  );
-
-  // useEffect(()=> {
-  //   spacerBottomRef.offsetHeight = 200
-  // }, [])
-
-  console.log("visibleItemsHeightsRef", visibleItemsHeightsRef.current);
-
-  const onScroll = (e) => {
-    const list = e.target;
-    const chunkHeight = getChunkTotalHeight(
-      visibleItemsHeightsRef.current.filter(
-        (_, i) => i < chunkIndex * visibleCount
-      )
-    );
-
-    console.log("chunkHeight", chunkHeight);
-
-    // scrolling down
-    if (list.scrollTop > lastScrollPosition.current) {
-      console.log("scrolling down");
-      console.log(
-        "list.scrollTop + list.offsetHeight",
-        list.scrollTop + list.offsetHeight
-      );
-
-      if (
-        list.scrollTop + list.offsetHeight >= chunkHeight &&
-        spacerTopRef.current.offsetHeight !== chunkHeight
-      ) {
-        console.log(
-          "spacerTopRef.offsetHeight",
-          spacerTopRef.current.offsetHeight
-        );
-
-        const newChunkIndex = chunkIndex + 1;
-
-        spacerTopRef.current.style.height = chunkHeight + "px";
-
-        setVisibleItems(
-          items.filter(
-            (_, index) =>
-              index > chunkIndex * visibleCount &&
-              index < newChunkIndex * visibleCount
-          )
-        );
-
-        setChunkIndex(newChunkIndex);
-
-        list.scrollTop = chunkHeight;
-      }
-    } // scrolling up
-    else {
-      console.log("scrolling up", list.scrollTop);
-    }
-    lastScrollPosition.current = list.scrollTop;
-  };
-
-  return (
-    <ul className="list" ref={listRef} onScroll={onScroll}>
-      <li ref={spacerTopRef}></li>
-      {visibleItems.map((item, i) => {
-        return (
-          <ListItem
-            {...item}
-            key={`item-${i}`}
-            ref={(node) => {
-              if (node) {
-                visibleItemsHeightsRef.current.push(node.offsetHeight);
-              }
-            }}
-          />
-        );
-      })}
-      <li ref={spacerBottomRef}></li>
-    </ul>
-  );
-});
-
-export const ListItem = forwardRef(
-  (
-    {
-      id,
-      first_name: firstName,
-      last_name: lastName,
-      email,
-      gender,
-      description,
-    },
-    ref
-  ) => {
-    return (
-      <li className="list__item" ref={ref}>
-        <span className="list__item__column list__item__column--id">{id}</span>
-        <span className="list__item__column list__item__column--first-name">
-          {firstName}
-        </span>
-        <span className="list__item__column list__item__column--last-name">
-          {lastName}
-        </span>
-        <span className="list__item__column list__item__column--email">
-          {email}
-        </span>
-        <span className="list__item__column list__item__column--gender">
-          {gender}
-        </span>
-        <span className="list__item__column list__item__column--description">
-          {description}
-        </span>
-      </li>
-    );
-  }
+export const ArrowIcon = ({ style }) => (
+  <svg width="7" height="12" viewBox="0 0 14 24" style={style}>
+    <path
+      fill="currentColor"
+      d="M1.83 24L0 22L10 11.996L0 2L1.83 0L14 11.996L1.83 24Z"
+    />
+  </svg>
 );
 
 export default Example;
